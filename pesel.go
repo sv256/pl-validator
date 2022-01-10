@@ -1,28 +1,35 @@
 package pl_validator
 
-import "errors"
+import (
+	"errors"
+)
 
 type PeselValidator struct {
 	Validator
 }
 
-func (s *PeselValidator) validate(input uint64) error {
+func (s *PeselValidator) validate(input string) error {
 
-	count := checkDigitsCount(input)
+	helper := Helper{}
+
+	count := len(input)
 	if count < 11 {
 		return errors.New("pesel number is too short")
 	}
 	if count > 11 {
 		return errors.New("pesel number is too long")
 	}
-	return nil
-}
 
-func checkDigitsCount(input uint64) int {
-	count := 0
-	for input != 0 {
-		input /= 10
-		count += 1
+	//year, _ := helper.digit(input, 0, 2)
+	month, _ := helper.digit(input, 2, 4)
+	day, _ := helper.digit(input, 4, 6)
+
+	if month == 0 || month%20 > 12 {
+		return errors.New("incorrect month. (range 1-12)")
 	}
-	return count
+	if day < 1 || day > 31 {
+		return errors.New("incorrect day. (range 1-31)")
+	}
+
+	return nil
 }
