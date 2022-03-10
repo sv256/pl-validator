@@ -56,6 +56,26 @@ func TestValidatePesel_incorrectDay(t *testing.T) {
 	}
 }
 
+func TestValidatePesel_correct(t *testing.T) {
+	peselValidator := PeselValidator{}
+	for _, data := range correctData {
+		result := peselValidator.validate(data)
+		if result != nil {
+			t.Errorf(result.Error())
+		}
+	}
+}
+
+func TestValidatePesel_incorrect(t *testing.T) {
+	peselValidator := PeselValidator{}
+	for _, data := range incorrectData {
+		result := peselValidator.validate(data)
+		if result != nil && result.Error() != "wrong pesel controlsum" {
+			t.Errorf(result.Error())
+		}
+	}
+}
+
 var incorrectMonthData = []string{
 	"00007713909",
 	"00140098765",
@@ -180,56 +200,8 @@ var correctData = []string{
 }
 
 var incorrectData = []string{
-	"55558888888",
 	"16080641594",
-	"941164297",
-	"912021964561",
-	"54101512461552",
-	"860825515151942342",
 	"46100489223",
 	"02321164427",
 	"61082859739",
-	"70060623654891",
-	"91132538616",
-	"91192538616",
-	"91332538616",
-	"91392538616",
-	"91532538616",
-	"91592538616",
-	"91732538616",
-	"91792538616",
-	"91932538616",
-	"91992538616",
-	"91542538616",
-	"91042538616",
-	"51121334296",
-	"61100534881",
-	"81121533561",
-	"81092235391",
-	"91042339227",
-	"51110537337",
-	"51091936995",
-	"81080838244",
-	"61102934284",
-	"81053035384",
-	"81091734868",
-	"61072432193",
-	"41032375751",
-	"71021325573",
-	"41092312544",
-	"73021324142",
-	"64090318664",
-	"54120365967",
-	"84113357316",
-	"64013121346",
-	"74063023477",
-	"64093282457",
-	"54063566859",
-	"04263",
-	"74093237886",
-	"64023714382",
-	"75043551869",
-	"56103224792",
-	"97103963552",
-	"78083553272",
 }

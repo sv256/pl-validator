@@ -1,6 +1,9 @@
 package pl_validator
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestHelper_digit(t *testing.T) {
 	helper := Helper{}
@@ -48,4 +51,55 @@ func TestHelper_digit(t *testing.T) {
 			t.Errorf("Expected %v, got %v", -1, result5)
 		}
 	}
+}
+
+func TestHelper_stringToIntArray(t *testing.T) {
+	helper := Helper{}
+	result1, err1 := helper.stringToIntArray("1234", "4")
+	input1 := []int{1, 2, 3, 4}
+
+	if err1 != nil {
+		t.Errorf("Expected %v, got %v", result1, err1)
+	}
+	if result1 != nil && !reflect.DeepEqual(input1, result1) {
+		t.Errorf("Expected %v, got %v", input1, result1)
+	}
+
+	result2, err2 := helper.stringToIntArray("111", "4")
+	input2 := []int{1, 1, 1, 0}
+
+	if err2 != nil {
+		t.Errorf("Expected %v, got %v", result2, err2)
+	}
+	if !reflect.DeepEqual(input2, result2) {
+		t.Errorf("Expected %v, got %v", input2, result2)
+	}
+
+	result3, err3 := helper.stringToIntArray("11g1", "4")
+
+	if err3.Error() != "problem with data conversion" {
+		t.Errorf("Expected %v, got %v", result3, err3)
+	}
+
+}
+
+func TestHelper_Reduce(t *testing.T) {
+	helper := Helper{}
+	transform := func(accumulator int, entry int, idx int) int {
+		times := []int{1, 3, 7, 9}
+		return accumulator + entry*(times[idx%4])
+	}
+	arr := []int{7, 8, 0, 6, 0, 2, 5, 8, 1, 5}
+
+	result, err := helper.reduce(arr, 0, transform)
+
+	if err != nil {
+		t.Errorf("Reduce() error = %v, result = %v", err, result)
+		return
+	}
+	if result != 214 {
+		t.Errorf("Reduce() result = %v, expected result = %v", result, 214)
+		return
+	}
+
 }

@@ -2,8 +2,6 @@ package pl_validator
 
 import (
 	"errors"
-	"strconv"
-	"strings"
 )
 
 type PeselValidator struct {
@@ -36,14 +34,36 @@ func (s *PeselValidator) validate(input string) error {
 		return errors.New("incorrect day. (range 1-31)")
 	}
 
-	var inputAsArray []int
-
-	for pos, char := range input {
-		Int, err := strconv.Atoi(char)
-
-		append(inputAsArray, Int)
+	transform := func(accumulator int, entry int, idx int) int {
+		return accumulator + entry*(times[idx%4])
 	}
-	inputAsArray := strings.Split(input, "")
+
+	digits, _ := helper.stringToIntArray(input, "11")
+	lastDigit := digits[10]
+	digits = digits[:len(digits)-1]
+	control := 0
+	for index, element := range digits {
+		if index == 0 {
+			control = control + element*(times[index%4])
+		} else {
+			control = digits[index-1] + element*(times[index%4])
+		}
+	}
+	result, err := helper.reduce(digits, 0, transform)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	control = result.(int) % 10
+	if control == 0 {
+		if lastDigit != 0 {
+			return errors.New("wrong pesel controlsum")
+		}
+	} else {
+		if 10-control != lastDigit {
+			return errors.New("wrong pesel controlsum")
+		}
+	}
 
 	return nil
 }
